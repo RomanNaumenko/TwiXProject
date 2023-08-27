@@ -14,4 +14,13 @@ def profile_list(request):
         return render(request, 'profile_list.html', {'profiles': profiles})
     else:
         messages.success(request, "You must be logged in to overview profile list.")
-        return render(request, 'home.html')
+        return redirect('home.html')
+
+
+def profile(request, pk):
+    if request.user.is_authenticated:
+        profile = Profile.objects.get(user_id=pk)
+        return render(request, 'profile.html', {'profile': profile})
+    else:
+        messages.success(request, "You must be logged in to overview profile list.")
+        return redirect('home.html')
