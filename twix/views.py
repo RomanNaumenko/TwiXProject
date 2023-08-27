@@ -1,10 +1,18 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import Profile
+from .models import Profile, Twix
 
 
 # Create your views here.
 def home(request):
+
+    if request.user.is_authenticated:
+        # Get the profiles that the current user is following
+        following_profiles = request.user.profile.follows.all()
+
+        # Get Twixes from the users that the current user is following
+        twixes = Twix.objects.filter(user__profile__in=following_profiles)
+        return render(request, 'home.html', {"twixes": twixes})
     return render(request, 'home.html', {})
 
 

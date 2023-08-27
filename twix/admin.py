@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group, User
-from .models import Profile
+from .models import Profile, Twix
 
 # Register your models here.
 
@@ -24,4 +24,5 @@ class UserAdmin(admin.ModelAdmin):
 # Reregister user
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
+admin.site.register(Twix)
 # admin.site.register(Profile)
