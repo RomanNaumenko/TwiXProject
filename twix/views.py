@@ -1,19 +1,31 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Profile, Twix
+from .forms import TwixForm
 
 
 # Create your views here.
 def home(request):
-
     if request.user.is_authenticated:
         # Get the profiles that the current user is following
+        form = TwixForm(request.POST or None)
+        if request.method == "POST":
+            if form.is_valid():
+                twix = form.save(commit=False)
+                twix.user = request.user
+                form.save()
+                messages.success(request, "Your twix has been posted!")
+                return redirect("home")
+
         following_profiles = request.user.profile.follows.all()
 
         # Get Twixes from the users that the current user is following
         twixes = Twix.objects.filter(user__profile__in=following_profiles)
+        return render(request, 'home.html', {"twixes": twixes, "form": form})
+
+    else:
+        twixes = Twix.objects.order_by("-creation_date")
         return render(request, 'home.html', {"twixes": twixes})
-    return render(request, 'home.html', {})
 
 
 def profile_list(request):

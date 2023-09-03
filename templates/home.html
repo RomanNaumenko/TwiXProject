@@ -17,7 +17,7 @@
 				<img src="{{ twix.user.profile.profile_image.url }}" width=50 height=50 class="rounded-circle" alt="{{ profile.user.username }}">
 
 				{% else %}
-				<img src="#" width=50 height=50 class="rounded-circle" alt="{{ profile.user.username }}">
+				<img src="{% static 'regular_user_profile.png' %}" width=50 height=50 class="rounded-circle" alt="{{ profile.user.username }}">
 				{% endif %}
 		</div>
 
@@ -60,9 +60,10 @@
   	{{ form.as_p }}
 
 
-  <button type="submit" class="btn btn-secondary">Post Twix!</button>
+  <button type="submit" class="btn btn-success">Post Twix!</button>
 </form>
 {% endif %}
 </div>
-
+        </div>
+</div>
 {% endblock %}
