@@ -3,6 +3,7 @@ from django.contrib import messages
 from .models import Profile, Twix
 from .forms import TwixForm, RegisterForm
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 
 from django import forms
 
@@ -98,3 +99,19 @@ def register_user(request):
             messages.success(request, "You have successfully register!")
             return redirect('home')
     return render(request, "register.html", {})
+
+
+def update_user(request):
+    if request.user.is_authenticated:
+        current_user = User.objects.get(id=request.user.id)
+        form = RegisterForm(request.POST or None, instance=current_user)
+        if form.is_valid():
+            form.save()
+            login(request)
+            messages.success(request, "Your profile has been successfully updated!")
+            return redirect('home')
+
+        return render(request, "update_user.html", {"form": form})
+    else:
+        messages.success(request, "You must me logged in for that action!")
+        return redirect('home')
