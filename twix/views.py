@@ -1,7 +1,10 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from .models import Profile, Twix
-from .forms import TwixForm
+from .forms import TwixForm, RegisterForm
+from django.contrib.auth import authenticate, login, logout
+
+from django import forms
 
 
 # Create your views here.
@@ -55,3 +58,43 @@ def profile(request, pk):
     else:
         messages.success(request, "You must be logged in to overview profile list.")
         return redirect('home.html')
+
+
+def login_user(request):
+    if request.method == "POST":
+        username = request.POST["username"]
+        password = request.POST["password"]
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            messages.success(request, "You have successfully login!")
+            return redirect('home')
+        else:
+            messages.success(request, "Invalid authentication credentials")
+            return redirect('login')
+    return render(request, 'login.html', {})
+
+
+def logout_user(request):
+    logout(request)
+    messages.success(request, "You have successfully logout!")
+    return redirect('home')
+
+
+def register_user(request):
+    if request.method == "POST":
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data["username"]
+            password = form.cleaned_data["password1"]
+            # first_name = form.cleaned_data["first_name"]
+            # last_name = form.cleaned_data["last_name"]
+            # email = form.cleaned_data["email"]
+
+            # Log in user
+            user = authenticate(username=username, password=password)
+            login(request, user)
+            messages.success(request, "You have successfully register!")
+            return redirect('home')
+    return render(request, "register.html", {})
