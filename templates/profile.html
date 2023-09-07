@@ -1,26 +1,67 @@
 {% extends 'base/base.html' %}
 {% load static %}
 {% block content %}
+
   {% if profile %}
-    <div class="container">
+    <div class="container mt-4">
       <div class="row">
-        <div class="col-md-8">
-          <h2>{{ profile.user.username }}'s Profile</h2>
-          <hr>
-        </div>
-      </div>
-    </div>
-    <div class="container">
-      <div class="row">
-        <div class="col-md-3">
-          <!-- Profile Picture and User Info -->
-          <!-- Add your profile picture and user info here -->
-        </div>
-        <div class="col-md-6">
+        <div class="col-md-10">
           <!-- User's Tweets or Posts -->
           <!-- Add your code to display user's tweets or posts here -->
+          {% for twix in twixes %}
+            <div class="card mb-3">
+              <div class="card-body">
+                <div class="media">
+                  <div class="media-left">
+                    {% if twix.user.profile.profile_image %}
+                      <img src="{{ twix.user.profile.profile_image.url }}" width="50" height="50" class="rounded-circle" alt="{{ twix.user.username }}">
+                    {% else %}
+                      <img src="{% static 'regular_user_profile.png' %}" width="50" height="50" class="rounded-circle" alt="{{ twix.user.username }}">
+                    {% endif %}
+                  </div>
+                  <div class="media-body">
+                    <p class="card-text">{{ twix.body }}</p>
+                    <small class="text-muted">
+                      ({{ twix.creation_date }}) By @{{ twix.user.username }}
+                      <span class="mx-2">{{ twix.number_of_likes }} {% if user in twix.likes.all %}<i class="fa-solid fa-heart text-danger"></i>{% else %}<i class="fa fa-heart-o text-danger"></i>{% endif %}</span>
+                      <a href="#"><i class="fa-solid fa-share text-secondary"></i></a>
+                    </small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2">
+          <h2>{{ profile.user.username }}</h2>
+          {% if profile.user.first_name and profile.user.last_name %}
+            <h4>{{ profile.user.first_name }} {{ profile.user.last_name }}</h4>
+          {% endif %}
+          <h6>Last login: {{ profile.user.last_login }}</h6>
+          <hr>
+          <div class="d-flex flex-column align-items-center">
+            <!-- Profile Picture and User Info -->
+            {% if profile.profile_image %}
+              <img src="{{ profile.profile_image.url }}" class="rounded-circle mb-3" width="150" height="150" alt="Profile image">
+            {% endif %}
+
+            <form method="POST">
+              {% csrf_token %}
+              {% if request.user.id == profile.user.id %}
+                  <a href="{% url 'update_user' %}" class="btn btn-outline-warning">Update Profile</a>
+              {% elif profile in user.profile.follows.all %}
+                <button class="btn btn-outline-danger mb-3" name="follow" value="unfollow" type="submit">
+                  Unfollow @{{ profile.user.username|lower }}
+                </button>
+              {% else %}
+                <button class="btn btn-outline-primary mb-3" name="follow" value="follow" type="submit">
+                  Follow @{{ profile.user.username|lower }}
+                </button>
+              {% endif %}
+            </form>
+          <br/>
+
+          </div>
           <div class="card">
             <div class="card-header">
               Followed By
@@ -45,27 +86,8 @@
               {% endfor %}
             </ul>
           </div>
-            <br/>
-            <form method="POST">
-                {% csrf_token %}
-                {% if profile in user.profile.follows.all %}
-                    <button class="btn btn-outline-danger" name="follow" value="unfollow" type="submit">
-                        Unfollow @{{ profile.user.username|lower }}
-                    </button>
-
-                {% else %}
-                    <button class="btn btn-outline-primary" name="follow" value="follow" type="submit">
-                        Follow @{{ profile.user.username|lower }}
-                    </button>
-                {% endif %}
-            </form>
-            <br/>
-        {% if request.user.id == profile.user.id %}
-            <a href="{% url 'update_user' %}" class="btn btn-outline-warning">Update profile</a>
-        {% endif %}
         </div>
       </div>
     </div>
-
   {% endif %}
 {% endblock %}

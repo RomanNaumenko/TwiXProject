@@ -4,8 +4,6 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 
-# Create your models here.
-
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     follows = models.ManyToManyField("self",
@@ -14,6 +12,7 @@ class Profile(models.Model):
                                      blank=True)
 
     date_modified = models.DateTimeField(User, auto_now=True)
+    profile_image = models.ImageField(null=True, blank=True, upload_to="images/")
 
     def __str__(self):
         return self.user.username
@@ -28,6 +27,7 @@ def create_profile(sender, instance, created, **kwargs):
         # Have the users follows themselves
         user_profile.follows.set([instance.profile.id])
         user_profile.save()
+
 
 # post_save.connect(create_profile, sender=User)
 

@@ -1,5 +1,5 @@
 from django import forms
-from .models import Twix
+from .models import Twix, Profile
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
@@ -16,6 +16,14 @@ class TwixForm(forms.ModelForm):
     class Meta:
         model = Twix
         exclude = ("user",)
+
+
+class ProfileImgForm(forms.ModelForm):
+    profile_image = forms.ImageField(label="Profile Pictures")
+
+    class Meta:
+        model = Profile
+        fields = ('profile_image', )
 
 
 class RegisterForm(UserCreationForm):
